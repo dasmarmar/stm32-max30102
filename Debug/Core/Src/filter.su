@@ -1,0 +1,3 @@
+filter.c:15:13:dcRemoval	48	static
+filter.c:25:6:lowPassButterworthFilter	24	static
+filter.c:38:7:meanDiff	24	static

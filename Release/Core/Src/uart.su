@@ -1,0 +1,4 @@
+uart.c:17:6:uartInit	8	static
+uart.c:34:6:uart_PrintString	8	static
+uart.c:39:6:uart_PrintFloat	24	static
+uart.c:51:6:uart_PrintInt	24	static
