@@ -45,8 +45,7 @@ void uart_PrintFloat(float value)
 			(unsigned int)value/100,
 			(unsigned int)value % 100);
 
-	HAL_UART_Transmit(&stLinkUart, buf, strlen((char*)buf), HAL_MAX_DELAY);
-}
+	HAL_UART_Transmit(&stLinkUart, buf, strlen((char*)buf), HAL_MAX_DELAY);}
 
 void uart_PrintInt(unsigned int value, unsigned char base)
 {

@@ -73,6 +73,11 @@
 
 #define DATA_READ_FAIL			0xFFFFFFFF
 
+// Set to 0 to poll the MAX30102
+// Set to 1 to enable interrupts from MAX30102
+// Connect INT active low output to your device
+#define PUSLE_OXIMETER_INTERRUPT	0
+
 typedef enum{
 	HEART_RATE,
 	SPO2,

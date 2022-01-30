@@ -1,4 +1,4 @@
 uart.c:17:6:uartInit	8	static
 uart.c:34:6:uart_PrintString	16	static
 uart.c:39:6:uart_PrintFloat	40	static
-uart.c:51:6:uart_PrintInt	32	static
+uart.c:50:6:uart_PrintInt	32	static

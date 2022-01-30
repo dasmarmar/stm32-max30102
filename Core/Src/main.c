@@ -21,7 +21,6 @@
   */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
-#include "pulse_oximeter.h"
 #include "main.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -29,6 +28,7 @@
 #include "string.h"
 #include "uart.h"
 #include "system.h"
+#include "pulse_oximeter.h"
 
 /* USER CODE END Includes */
 
@@ -55,7 +55,7 @@ UART_HandleTypeDef huart6;
 PCD_HandleTypeDef hpcd_USB_OTG_FS;
 
 /* USER CODE BEGIN PV */
-//volatile uint8_t pulseOximiterIntFlag = 0;
+volatile uint8_t pulseOximiterIntFlag = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -141,18 +141,41 @@ int main(void)
   // Measurement Modes:
   // HEART_RATE - only Red Led active
   // SPO2 - Both IR & Red Led active
-  // MULTI_LED - Both led's active (timing can be configured; see datasheet)
+  // MULTI_LED - Both led's active (timing can be configured; see DataSheet)
   pulseOximeter_setMeasurementMode(SPO2);
 
   currentMillis = millis();
 
   while (1)
   {
-	  // Read FIFO LED Data
-	  fifoLedData = pulseOximeter_readFifo();
+	  if( PUSLE_OXIMETER_INTERRUPT == 1 )
+	  {
+		  if( pulseOximiterIntFlag )
+		  {
+			  pulseOximiterIntFlag = 0;
 
-	  // Get BPM/SpO2 readings
-	  pulseOximeter = pulseOximeter_update(fifoLedData);
+			  // Read FIFO LED Data
+			  fifoLedData = pulseOximeter_readFifo();
+
+			  // Get BPM/SpO2 readings
+			  pulseOximeter = pulseOximeter_update(fifoLedData);
+
+			  pulseOximeter_clearInterrupt();
+		  }
+
+	  }else{
+
+		  // Read FIFO LED Data
+		  fifoLedData = pulseOximeter_readFifo();
+
+		  // Get BPM/SpO2 readings
+		  pulseOximeter = pulseOximeter_update(fifoLedData);
+
+		  pulseOximeter_resetFifo();
+
+		  // Small delay
+		  HAL_Delay(10);
+	  }
 
 	  // Display the data over the built in USB
 	  // If available; check board specs
@@ -164,12 +187,8 @@ int main(void)
 		  lastMillis = currentMillis;
 	  }
 
-	  pulseOximeter_resetFifo();
-
-	  // Small delay
-	  HAL_Delay(10);
-
     /* USER CODE END WHILE */
+
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
@@ -418,11 +437,11 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : Pulse_Oximiter_Int_Pin */
-  GPIO_InitStruct.Pin = Pulse_Oximiter_Int_Pin;
+  /*Configure GPIO pin : Pulse_Oximeter_Int_Pin */
+  GPIO_InitStruct.Pin = Pulse_Oximeter_Int_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
-  HAL_GPIO_Init(Pulse_Oximiter_Int_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(Pulse_Oximeter_Int_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : RMII_TXD1_Pin */
   GPIO_InitStruct.Pin = RMII_TXD1_Pin;
@@ -460,15 +479,15 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-/*void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
-	if(GPIO_Pin == Pulse_Oximiter_Int_Pin)
+	if(GPIO_Pin == Pulse_Oximeter_Int_Pin)
 	{
 		pulseOximiterIntFlag = 1;
 
 		//spO2_registerDump();
 	}
-}*/
+}
 
 /* USER CODE END 4 */
 

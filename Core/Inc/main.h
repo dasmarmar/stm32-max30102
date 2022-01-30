@@ -77,9 +77,9 @@ void Error_Handler(void);
 #define RMII_RXD1_GPIO_Port GPIOC
 #define LD1_Pin GPIO_PIN_0
 #define LD1_GPIO_Port GPIOB
-#define Pulse_Oximiter_Int_Pin GPIO_PIN_12
-#define Pulse_Oximiter_Int_GPIO_Port GPIOF
-#define Pulse_Oximiter_Int_EXTI_IRQn EXTI15_10_IRQn
+#define Pulse_Oximeter_Int_Pin GPIO_PIN_12
+#define Pulse_Oximeter_Int_GPIO_Port GPIOF
+#define Pulse_Oximeter_Int_EXTI_IRQn EXTI15_10_IRQn
 #define RMII_TXD1_Pin GPIO_PIN_13
 #define RMII_TXD1_GPIO_Port GPIOB
 #define LD3_Pin GPIO_PIN_14

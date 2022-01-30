@@ -368,9 +368,19 @@ void pulseOximeter_resetFifo(void)
 //
 void pulseOximeter_initFifo(void)
 {
+	// Check if polling/interrupt mode
+	if( PUSLE_OXIMETER_INTERRUPT == 1 )
+	{
+		pulseOximeter_writeRegister(FIFO_CONFIG, 0x0F);
 
-	pulseOximeter_writeRegister(FIFO_CONFIG, 0x0F);
-	//pulseOximiter_writeRegister(INT_ENABLE_1, 0x00);
+		// FIFO almost full interrupt enable
+		pulseOximeter_writeRegister(INT_ENABLE_1, 0x40);
+
+		pulseOximeter_clearInterrupt();
+	}else{
+		pulseOximeter_writeRegister(FIFO_CONFIG, 0x0F);
+		pulseOximeter_writeRegister(INT_ENABLE_1, 0x00);
+	}
 }
 
 FIFO_LED_DATA pulseOximeter_readFifo(void)
@@ -426,15 +436,16 @@ int8_t pulseOximeter_readFIFO(uint8_t* dataBuf, uint8_t numBytes)
 	return 0;
 }
 
+// Read the INT STATUS register to clear interrupt
 void pulseOximeter_clearInterrupt(void)
 {
 	uint8_t readStatus;
 	uint8_t readResult;
 
 	readStatus = pulseOximeter_readRegister(INT_STATUS_1, &readResult);
-    if( readStatus == -1){
+    /*if( readStatus == -1){
 
-    }
+    }*/
 }
 
 
