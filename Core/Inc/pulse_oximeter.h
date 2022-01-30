@@ -9,8 +9,8 @@
  *  https://github.com/xcoder123/MAX30100
  */
 
-#ifndef __PULSE_OXIMITER_H__
-#define __PULSE_OXIMITER_H__
+#ifndef __PULSE_OXIMETER_H__
+#define __PULSE_OXIMETER_H__
 
 #include "stm32f4xx_hal.h"
 #include "stm32f4xx_hal_i2c.h"
@@ -151,7 +151,7 @@ typedef struct {
   float temperature;
 }MAX30102;
 
-extern MAX30102 pulseOximiter;
+extern MAX30102 pulseOximeter;
 
 
 typedef enum {
@@ -165,29 +165,29 @@ extern PULSE_STATE_MACHINE currentPulseDetectorState;
 
 void I2C_Init(void);
 
-void pulseOximiter_setMeasurementMode(uint8_t mode);
-MEASUREMENT_MODE pulseOximiter_getMeasurementMode(void);
-void pulseOximiter_setPowerMode(POWER_MODE mode);
-POWER_MODE pulseOximiter_getPowerMode(void);
-int8_t pulseOximiter_readRegister(uint8_t reg, uint8_t* value);
-HAL_StatusTypeDef pulseOximiter_writeRegister(uint8_t reg, uint8_t value);
-void pulseOximiter_setSampleRate(uint8_t sampleRate);
-SAMPLE_RATE pulseOximiter_getSampleRate(void);
-void pulseOximiter_setLedCurrent(uint8_t led, float currentLevel);
-float pulseOximiter_getLedCurrent(uint8_t led);
-void pulseOximiter_setPulseWidth(uint8_t pulseWidth);
-PULSE_WIDTH pulseOximiter_getPulseWidth(void);
-int8_t pulseOximiter_readFIFO(uint8_t* dataBuf, uint8_t numBytes);
-void pulseOximiter_resetRegisters(void);
+void pulseOximeter_setMeasurementMode(uint8_t mode);
+MEASUREMENT_MODE pulseOximeter_getMeasurementMode(void);
+void pulseOximeter_setPowerMode(POWER_MODE mode);
+POWER_MODE pulseOximeter_getPowerMode(void);
+int8_t pulseOximeter_readRegister(uint8_t reg, uint8_t* value);
+HAL_StatusTypeDef pulseOximeter_writeRegister(uint8_t reg, uint8_t value);
+void pulseOximeter_setSampleRate(uint8_t sampleRate);
+SAMPLE_RATE pulseOximeter_getSampleRate(void);
+void pulseOximeter_setLedCurrent(uint8_t led, float currentLevel);
+float pulseOximeter_getLedCurrent(uint8_t led);
+void pulseOximeter_setPulseWidth(uint8_t pulseWidth);
+PULSE_WIDTH pulseOximeter_getPulseWidth(void);
+int8_t pulseOximeter_readFIFO(uint8_t* dataBuf, uint8_t numBytes);
+void pulseOximeter_resetRegisters(void);
 
-void pulseOximiter_resetFifo(void);
-FIFO_LED_DATA pulseOximiter_readFifo(void);
-float pulseOximiter_readTemperature(void);
-void pulseOximiter_initFifo(void);
-void pulseOximiter_clearInterrupt(void);
-MAX30102 pulseOximiter_update(FIFO_LED_DATA m_fifoData);
+void pulseOximeter_resetFifo(void);
+FIFO_LED_DATA pulseOximeter_readFifo(void);
+float pulseOximeter_readTemperature(void);
+void pulseOximeter_initFifo(void);
+void pulseOximeter_clearInterrupt(void);
+MAX30102 pulseOximeter_update(FIFO_LED_DATA m_fifoData);
 bool detectPulse(float sensor_value);
 void balanceIntesities( float redLedDC, float IRLedDC );
-void pulseOximiter_displayData(void);
+void pulseOximeter_displayData(void);
 
-#endif /* __PULSE_OXIMITER_H__ */
+#endif /* __PULSE_OXIMETER_H__ */

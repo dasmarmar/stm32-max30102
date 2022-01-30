@@ -1,4 +1,5 @@
-Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/pulse_oximeter.h \
+Core/Src/pulse_oximeter.o: ../Core/Src/pulse_oximeter.c \
+ ../Core/Inc/pulse_oximeter.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h \
  ../Core/Inc/stm32f4xx_hal_conf.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h \
@@ -30,7 +31,7 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/pulse_oximeter.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pcd.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_ll_usb.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pcd_ex.h \
- ../Core/Inc/main.h ../Core/Inc/uart.h ../Core/Inc/system.h
+ ../Core/Inc/system.h ../Core/Inc/uart.h ../Core/Inc/filter.h
 
 ../Core/Inc/pulse_oximeter.h:
 
@@ -96,8 +97,8 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/pulse_oximeter.h \
 
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pcd_ex.h:
 
-../Core/Inc/main.h:
+../Core/Inc/system.h:
 
 ../Core/Inc/uart.h:
 
-../Core/Inc/system.h:
+../Core/Inc/filter.h:

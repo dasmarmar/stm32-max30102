@@ -1,6 +1,6 @@
 "Core/Src/filter.o"
 "Core/Src/main.o"
-"Core/Src/pulse_oximiter.o"
+"Core/Src/pulse_oximeter.o"
 "Core/Src/stm32f4xx_hal_msp.o"
 "Core/Src/stm32f4xx_it.o"
 "Core/Src/syscalls.o"

@@ -3,8 +3,8 @@
   ******************************************************************************
   * @file           : main.c
   * @brief          : Small sample program interfacing the MAX30102
-  * 				: pulse oximiter. Reference DataSheet
-  * 				: Tested on STM32F1038T6 'Blue Pill' Board
+  * 				: pulse-oximeter. Reference DataSheet
+  * 				: Tested on STM32F429ZI Nucleo Board
   *
   ******************************************************************************
   * @attention
@@ -21,6 +21,7 @@
   */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
+#include "pulse_oximeter.h"
 #include "main.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -28,7 +29,6 @@
 #include "string.h"
 #include "uart.h"
 #include "system.h"
-#include "pulse_oximiter.h"
 
 /* USER CODE END Includes */
 
@@ -55,7 +55,7 @@ UART_HandleTypeDef huart6;
 PCD_HandleTypeDef hpcd_USB_OTG_FS;
 
 /* USER CODE BEGIN PV */
-volatile uint8_t pulseOximiterIntFlag = 0;
+//volatile uint8_t pulseOximiterIntFlag = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -110,55 +110,61 @@ int main(void)
   I2C_Init();
   uartInit();
   FIFO_LED_DATA fifoLedData;
-
+  long currentMillis = 0;
+  long lastMillis = 0;
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
 
-  pulseOximiter_resetRegisters();
+  pulseOximeter_resetRegisters();
 
   // Setup up MAX30102 FIFO registers
-  pulseOximiter_initFifo();
+  pulseOximeter_initFifo();
 
   // Set sampling rate to 100MSPS and
   // pulse width to 411us
   // See DataSheet for available
   // sampling rate/pulse width combinations
-  pulseOximiter_setSampleRate(_100SPS);
-  pulseOximiter_setPulseWidth(_411_US);
+  pulseOximeter_setSampleRate(_100SPS);
+  pulseOximeter_setPulseWidth(_411_US);
 
   // Set Red/IR Led current
   // 0 - 51mA maximum
-  pulseOximiter_setLedCurrent(RED_LED, 50);
-  pulseOximiter_setLedCurrent(IR_LED, 5);
+  pulseOximeter_setLedCurrent(RED_LED, 50);
+  pulseOximeter_setLedCurrent(IR_LED, 5);
 
   // Set FIFO registers to zero
-  pulseOximiter_resetFifo();
+  pulseOximeter_resetFifo();
 
   // Set the Measurement Mode
   // Measurement Modes:
   // HEART_RATE - only Red Led active
   // SPO2 - Both IR & Red Led active
   // MULTI_LED - Both led's active (timing can be configured; see datasheet)
-  pulseOximiter_setMeasurementMode(SPO2);
+  pulseOximeter_setMeasurementMode(SPO2);
+
+  currentMillis = millis();
 
   while (1)
   {
-	  pulseOximiter.temperature = pulseOximiter_readTemperature();
-
 	  // Read FIFO LED Data
-	  fifoLedData = pulseOximiter_readFifo();
+	  fifoLedData = pulseOximeter_readFifo();
 
 	  // Get BPM/SpO2 readings
-	  pulseOximiter = pulseOximiter_update(fifoLedData);
+	  pulseOximeter = pulseOximeter_update(fifoLedData);
 
 	  // Display the data over the built in USB
 	  // If available; check board specs
 	  // use terminal program and set BAUD = 115200
-	  //pulseOximiter_displayData();
+	  currentMillis = millis();
+	  if( currentMillis - lastMillis > 1000 )
+	  {
+		  pulseOximeter_displayData();
+		  lastMillis = currentMillis;
+	  }
 
-	  pulseOximiter_resetFifo();
+	  pulseOximeter_resetFifo();
 
 	  // Small delay
 	  HAL_Delay(10);

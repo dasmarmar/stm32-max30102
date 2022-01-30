@@ -9,15 +9,15 @@
  *  https://github.com/xcoder123/MAX30100
  */
 
-#include "pulse_oximiter.h"
+#include "pulse_oximeter.h"
 #include "system.h"
 #include "uart.h"
 #include "filter.h"
 #include "math.h"
 
-I2C_HandleTypeDef hi2c2;
+I2C_HandleTypeDef hi2c1;
 
-MAX30102 pulseOximiter = {0};
+MAX30102 pulseOximeter = {0};
 FIFO_LED_DATA fifoData = {0};
 
 MEASUREMENT_MODE measurementMode = SPO2;
@@ -57,24 +57,24 @@ LEDCurrent IrLedCurrent;
 */
 void I2C_Init(void)
 {
-	hi2c2.Instance = I2C2;
-	hi2c2.Init.ClockSpeed = 100000;
-	hi2c2.Init.DutyCycle = I2C_DUTYCYCLE_2;
-	hi2c2.Init.OwnAddress1 = 0;
-	hi2c2.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
-	hi2c2.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
-	hi2c2.Init.OwnAddress2 = 0;
-	hi2c2.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
-	hi2c2.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
+	hi2c1.Instance = I2C1;
+	hi2c1.Init.ClockSpeed = 100000;
+	hi2c1.Init.DutyCycle = I2C_DUTYCYCLE_2;
+	hi2c1.Init.OwnAddress1 = 0;
+	hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
+	hi2c1.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
+	hi2c1.Init.OwnAddress2 = 0;
+	hi2c1.Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
+	hi2c1.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
 
 	// Call the HAL error handler on error
-	if (HAL_I2C_Init(&hi2c2) != HAL_OK)
+	if (HAL_I2C_Init(&hi2c1) != HAL_OK)
 	{
 		errorHandler();
 	}
 }
 
-int8_t pulseOximiter_readRegister(uint8_t reg, uint8_t* value)
+int8_t pulseOximeter_readRegister(uint8_t reg, uint8_t* value)
 {
 	HAL_StatusTypeDef retStatus;
 	uint8_t buf[2];
@@ -84,13 +84,13 @@ int8_t pulseOximiter_readRegister(uint8_t reg, uint8_t* value)
 
 	uint8_t address = (I2C_SLAVE_ID | I2C_WRITE);
 
-	retStatus = HAL_I2C_Master_Transmit(&hi2c2, address, buf, 1, HAL_MAX_DELAY);
+	retStatus = HAL_I2C_Master_Transmit(&hi2c1, address, buf, 1, HAL_MAX_DELAY);
 	if( retStatus != HAL_OK ){
 		return -1;
 	}
 
 	address = (I2C_SLAVE_ID | I2C_READ);
-	retStatus = HAL_I2C_Master_Receive(&hi2c2, address, buf, 1, HAL_MAX_DELAY);
+	retStatus = HAL_I2C_Master_Receive(&hi2c1, address, buf, 1, HAL_MAX_DELAY);
 	if( retStatus != HAL_OK ){
 		return -1;
 	}
@@ -100,7 +100,7 @@ int8_t pulseOximiter_readRegister(uint8_t reg, uint8_t* value)
 	return 0;
 }
 
-HAL_StatusTypeDef pulseOximiter_writeRegister(uint8_t reg, uint8_t value)
+HAL_StatusTypeDef pulseOximeter_writeRegister(uint8_t reg, uint8_t value)
 {
 	HAL_StatusTypeDef retStatus;
 	uint8_t buf[2];
@@ -108,18 +108,18 @@ HAL_StatusTypeDef pulseOximiter_writeRegister(uint8_t reg, uint8_t value)
 	buf[1] = value;
 
 	uint8_t address = (I2C_SLAVE_ID | I2C_WRITE);
-	retStatus = HAL_I2C_Master_Transmit(&hi2c2, address, buf, 2, HAL_MAX_DELAY);
+	retStatus = HAL_I2C_Master_Transmit(&hi2c1, address, buf, 2, HAL_MAX_DELAY);
 
 	return retStatus;
 }
 
 
-void pulseOximiter_setMeasurementMode(MEASUREMENT_MODE mode)
+void pulseOximeter_setMeasurementMode(MEASUREMENT_MODE mode)
 {
 	int8_t readStatus = 0;
 	uint8_t readResult;
 
-	readStatus = pulseOximiter_readRegister(MODE_CONFIG, &readResult);
+	readStatus = pulseOximeter_readRegister(MODE_CONFIG, &readResult);
 	if( readStatus == -1){
 		return;
 	}
@@ -133,7 +133,7 @@ void pulseOximiter_setMeasurementMode(MEASUREMENT_MODE mode)
 	default: return; break;
 	}
 
-	if( pulseOximiter_writeRegister(MODE_CONFIG, readResult) != HAL_OK){
+	if( pulseOximeter_writeRegister(MODE_CONFIG, readResult) != HAL_OK){
 		return;
 	}
 	else{
@@ -141,12 +141,12 @@ void pulseOximiter_setMeasurementMode(MEASUREMENT_MODE mode)
 	}
 }
 
-MEASUREMENT_MODE pulseOximiter_getMeasurementMode(void)
+MEASUREMENT_MODE pulseOximeter_getMeasurementMode(void)
 {
 	int8_t readStatus = 0;
 	uint8_t readResult;
 
-	readStatus = pulseOximiter_readRegister(MODE_CONFIG, &readResult);
+	readStatus = pulseOximeter_readRegister(MODE_CONFIG, &readResult);
 	if( readStatus == -1){
 		return MEASUREMENT_MODE_FAIL;
 	}
@@ -164,12 +164,12 @@ MEASUREMENT_MODE pulseOximiter_getMeasurementMode(void)
 	}
 }
 
-void pulseOximiter_setPowerMode(POWER_MODE mode)
+void pulseOximeter_setPowerMode(POWER_MODE mode)
 {
 	int8_t readStatus = 0;
 	uint8_t readResult;
 
-	readStatus = pulseOximiter_readRegister(MODE_CONFIG, &readResult);
+	readStatus = pulseOximeter_readRegister(MODE_CONFIG, &readResult);
 	if( readStatus == -1){
 		return;
 	}
@@ -182,7 +182,7 @@ void pulseOximiter_setPowerMode(POWER_MODE mode)
 	default: return; break;
 	}
 
-	if( pulseOximiter_writeRegister(MODE_CONFIG, readResult) != HAL_OK){
+	if( pulseOximeter_writeRegister(MODE_CONFIG, readResult) != HAL_OK){
 		return;
 	}
 	else{
@@ -190,12 +190,12 @@ void pulseOximiter_setPowerMode(POWER_MODE mode)
 	}
 }
 
-POWER_MODE pulseOximiter_getPowerMode(void)
+POWER_MODE pulseOximeter_getPowerMode(void)
 {
 	int8_t readStatus = 0;
 	uint8_t readResult;
 
-	readStatus = pulseOximiter_readRegister(MODE_CONFIG, &readResult);
+	readStatus = pulseOximeter_readRegister(MODE_CONFIG, &readResult);
 	if( readStatus == -1){
 		return POWER_MODE_FAIL;
 	}
@@ -210,25 +210,25 @@ POWER_MODE pulseOximiter_getPowerMode(void)
 	}
 }
 
-void pulseOximiter_resetRegisters(void)
+void pulseOximeter_resetRegisters(void)
 {
 	int8_t readStatus;
 	uint8_t readResult;
 
 
-	readStatus = pulseOximiter_readRegister(MODE_CONFIG, &readResult);
+	readStatus = pulseOximeter_readRegister(MODE_CONFIG, &readResult);
 	if( readStatus == -1){
 		return;
 	}
 
 	readResult &= ~(0x01 << 6);
 	readResult = readResult | (0x01 << 6);
-	if( pulseOximiter_writeRegister(MODE_CONFIG, readResult) != HAL_OK){
+	if( pulseOximeter_writeRegister(MODE_CONFIG, readResult) != HAL_OK){
 		return;
 	}
 }
 
-void pulseOximiter_setLedCurrent(uint8_t led, float currentLevel)
+void pulseOximeter_setLedCurrent(uint8_t led, float currentLevel)
 {
 	uint8_t value = 0;
 	uint8_t ledRegister = 0;
@@ -241,7 +241,7 @@ void pulseOximiter_setLedCurrent(uint8_t led, float currentLevel)
 	// slope derived from MAX30102 DataSheet
 	value = (uint8_t)(5.0 * currentLevel);
 
-	if( pulseOximiter_writeRegister(ledRegister, value) != HAL_OK){
+	if( pulseOximeter_writeRegister(ledRegister, value) != HAL_OK){
 		return;
 	}
 	else{
@@ -249,7 +249,7 @@ void pulseOximiter_setLedCurrent(uint8_t led, float currentLevel)
 	}
 }
 
-float pulseOximiter_getLedCurrent(uint8_t led)
+float pulseOximeter_getLedCurrent(uint8_t led)
 {
 	int8_t readStatus = 0;
 	float currentLevel;
@@ -261,7 +261,7 @@ float pulseOximiter_getLedCurrent(uint8_t led)
 	case IR_LED:	ledRegister = LED_PULSE_AMP_2; break;
 	}
 
-	readStatus = pulseOximiter_readRegister(ledRegister, &readResult);
+	readStatus = pulseOximeter_readRegister(ledRegister, &readResult);
 	if( readStatus == -1){
 		return -1;
 	}
@@ -271,12 +271,12 @@ float pulseOximiter_getLedCurrent(uint8_t led)
 	return currentLevel;
 }
 
-void pulseOximiter_setSampleRate(uint8_t sampleRate)
+void pulseOximeter_setSampleRate(uint8_t sampleRate)
 {
 	int8_t readStatus = 0;
 	uint8_t readResult;
 
-	readStatus = pulseOximiter_readRegister(SPO2_CONFIG, &readResult);
+	readStatus = pulseOximeter_readRegister(SPO2_CONFIG, &readResult);
 	if( readStatus == -1){
 		return;
 	}
@@ -285,7 +285,7 @@ void pulseOximiter_setSampleRate(uint8_t sampleRate)
 
 	readResult = readResult | (sampleRate << 2);
 
-	if( pulseOximiter_writeRegister(SPO2_CONFIG, readResult) != HAL_OK){
+	if( pulseOximeter_writeRegister(SPO2_CONFIG, readResult) != HAL_OK){
 		return;
 	}
 	else{
@@ -293,13 +293,13 @@ void pulseOximiter_setSampleRate(uint8_t sampleRate)
 	}
 }
 
-SAMPLE_RATE pulseOximiter_getSampleRate(void)
+SAMPLE_RATE pulseOximeter_getSampleRate(void)
 {
 	int8_t readStatus = 0;
 	uint8_t result;
 	uint8_t readResult;
 
-	readStatus = pulseOximiter_readRegister(SPO2_CONFIG, &readResult);
+	readStatus = pulseOximeter_readRegister(SPO2_CONFIG, &readResult);
 	if( readStatus == -1){
 		return _SAMPLE_RATE_FAIL;
 	}
@@ -311,12 +311,12 @@ SAMPLE_RATE pulseOximiter_getSampleRate(void)
 	return (SAMPLE_RATE)result;
 }
 
-void pulseOximiter_setPulseWidth(uint8_t pulseWidth)
+void pulseOximeter_setPulseWidth(uint8_t pulseWidth)
 {
 	int8_t readStatus = 0;
 	uint8_t readResult;
 
-	readStatus = pulseOximiter_readRegister(SPO2_CONFIG, &readResult);
+	readStatus = pulseOximeter_readRegister(SPO2_CONFIG, &readResult);
 	if( readStatus == -1){
 		return;
 	}
@@ -332,7 +332,7 @@ void pulseOximiter_setPulseWidth(uint8_t pulseWidth)
 	case _PULSE_WIDTH_FAIL: break;
 	}
 
-	if( pulseOximiter_writeRegister(SPO2_CONFIG, readResult) != HAL_OK){
+	if( pulseOximeter_writeRegister(SPO2_CONFIG, readResult) != HAL_OK){
 		return;
 	}
 	else{
@@ -340,13 +340,13 @@ void pulseOximiter_setPulseWidth(uint8_t pulseWidth)
 	}
 }
 
-PULSE_WIDTH pulseOximiter_getPulseWidth(void)
+PULSE_WIDTH pulseOximeter_getPulseWidth(void)
 {
 	int8_t readStatus = 0;
 		uint8_t result;
 		uint8_t readResult;
 
-		readStatus = pulseOximiter_readRegister(SPO2_CONFIG, &readResult);
+		readStatus = pulseOximeter_readRegister(SPO2_CONFIG, &readResult);
 		if( readStatus == -1){
 			return _PULSE_WIDTH_FAIL;
 		}
@@ -358,22 +358,22 @@ PULSE_WIDTH pulseOximiter_getPulseWidth(void)
 }
 
 // Write zero to all FIFO registers
-void pulseOximiter_resetFifo(void)
+void pulseOximeter_resetFifo(void)
 {
-	pulseOximiter_writeRegister(FIFO_WRITE_PTR, 0);
-	pulseOximiter_writeRegister(FIFO_READ_POINTER, 0);
-	pulseOximiter_writeRegister(FIFO_OVF_COUNTER, 0);
+	pulseOximeter_writeRegister(FIFO_WRITE_PTR, 0);
+	pulseOximeter_writeRegister(FIFO_READ_POINTER, 0);
+	pulseOximeter_writeRegister(FIFO_OVF_COUNTER, 0);
 }
 
 //
-void pulseOximiter_initFifo(void)
+void pulseOximeter_initFifo(void)
 {
 
-	pulseOximiter_writeRegister(FIFO_CONFIG, 0x0F);
+	pulseOximeter_writeRegister(FIFO_CONFIG, 0x0F);
 	//pulseOximiter_writeRegister(INT_ENABLE_1, 0x00);
 }
 
-FIFO_LED_DATA pulseOximiter_readFifo(void)
+FIFO_LED_DATA pulseOximeter_readFifo(void)
 {
 	uint8_t address;uint8_t buf[12];
 	uint8_t numBytes = 6;
@@ -382,10 +382,10 @@ FIFO_LED_DATA pulseOximiter_readFifo(void)
 
 	address = (I2C_SLAVE_ID | I2C_WRITE);
 
-	HAL_I2C_Master_Transmit(&hi2c2, address, buf, 1, HAL_MAX_DELAY);
+	HAL_I2C_Master_Transmit(&hi2c1, address, buf, 1, HAL_MAX_DELAY);
 
 	address = (I2C_SLAVE_ID | I2C_READ);
-	HAL_I2C_Master_Receive(&hi2c2, address, buf, numBytes, HAL_MAX_DELAY);
+	HAL_I2C_Master_Receive(&hi2c1, address, buf, numBytes, HAL_MAX_DELAY);
 
 	fifoData.irLedRaw = 0;
 	fifoData.redLedRaw = 0;
@@ -397,7 +397,7 @@ FIFO_LED_DATA pulseOximiter_readFifo(void)
 }
 
 
-int8_t pulseOximiter_readFIFO(uint8_t* dataBuf, uint8_t numBytes)
+int8_t pulseOximeter_readFIFO(uint8_t* dataBuf, uint8_t numBytes)
 {
 	HAL_StatusTypeDef retStatus;
 	uint8_t buf[12];
@@ -406,13 +406,13 @@ int8_t pulseOximiter_readFIFO(uint8_t* dataBuf, uint8_t numBytes)
 
 	uint8_t address = (I2C_SLAVE_ID | I2C_WRITE);
 
-	retStatus = HAL_I2C_Master_Transmit(&hi2c2, address, buf, 1, HAL_MAX_DELAY);
+	retStatus = HAL_I2C_Master_Transmit(&hi2c1, address, buf, 1, HAL_MAX_DELAY);
 	if( retStatus != HAL_OK ){
 		return -1;
 	}
 
 	address = (I2C_SLAVE_ID | I2C_READ);
-	retStatus = HAL_I2C_Master_Receive(&hi2c2, address, buf, numBytes, HAL_MAX_DELAY);
+	retStatus = HAL_I2C_Master_Receive(&hi2c1, address, buf, numBytes, HAL_MAX_DELAY);
 	if( retStatus != HAL_OK ){
 		return -1;
 	}
@@ -426,19 +426,19 @@ int8_t pulseOximiter_readFIFO(uint8_t* dataBuf, uint8_t numBytes)
 	return 0;
 }
 
-void pulseOximiter_clearInterrupt(void)
+void pulseOximeter_clearInterrupt(void)
 {
 	uint8_t readStatus;
 	uint8_t readResult;
 
-	readStatus = pulseOximiter_readRegister(INT_STATUS_1, &readResult);
+	readStatus = pulseOximeter_readRegister(INT_STATUS_1, &readResult);
     if( readStatus == -1){
 
     }
 }
 
 
-float pulseOximiter_readTemperature(void)
+float pulseOximeter_readTemperature(void)
 {
 	uint8_t tempDone = 1;
 	uint8_t readResult;
@@ -447,20 +447,20 @@ float pulseOximiter_readTemperature(void)
 	float temperature;
 
 	// Initiate a temperature conversion
-	pulseOximiter_writeRegister(DIE_TEMP_CONFIG, 1);
+	pulseOximeter_writeRegister(DIE_TEMP_CONFIG, 1);
 
 	// Wait for conversion finish
 	while( tempDone != 0 )
 	{
-		pulseOximiter_readRegister(DIE_TEMP_CONFIG, &tempDone);
+		pulseOximeter_readRegister(DIE_TEMP_CONFIG, &tempDone);
 	}
 
 	// Read Die temperature integer register
-	pulseOximiter_readRegister(DIE_TEMP_INTEGER, &readResult);
+	pulseOximeter_readRegister(DIE_TEMP_INTEGER, &readResult);
 	tempInteger = readResult;
 
 	// Read Die temperature fraction register
-	pulseOximiter_readRegister(DIE_TEMP_FRACTION, &readResult);
+	pulseOximeter_readRegister(DIE_TEMP_FRACTION, &readResult);
 	tempFraction = readResult;
 
 	// Conversion factor found in MAX30102 DataSheet
@@ -469,7 +469,7 @@ float pulseOximiter_readTemperature(void)
 	return temperature;
 }
 
-MAX30102 pulseOximiter_update(FIFO_LED_DATA m_fifoData)
+MAX30102 pulseOximeter_update(FIFO_LED_DATA m_fifoData)
 {
 	MAX30102 result = {
 	/*bool pulseDetected*/ false,
@@ -480,8 +480,11 @@ MAX30102 pulseOximiter_update(FIFO_LED_DATA m_fifoData)
 	/*float SaO2*/ currentSpO2Value,
 	/*uint32_t lastBeatThreshold*/ 0,
 	/*float dcFilteredIR*/ 0.0,
-	/*float dcFilteredRed*/ 0.0
+	/*float dcFilteredRed*/ 0.0,
+	/*float temperature;*/ 0.0
   };
+
+	result.temperature = pulseOximeter_readTemperature();
 
 	dcFilterIR = dcRemoval( (float)m_fifoData.irLedRaw, dcFilterIR.w, ALPHA );
 	dcFilterRed = dcRemoval( (float)m_fifoData.redLedRaw, dcFilterRed.w, ALPHA );
@@ -618,13 +621,13 @@ void balanceIntesities( float redLedDC, float IRLedDC )
 	  if( IRLedDC - redLedDC > MAGIC_ACCEPTABLE_INTENSITY_DIFF && redLEDCurrent < MAX30100_LED_CURRENT_50MA)
     {
       redLEDCurrent++;
-      pulseOximiter_setLedCurrent(RED_LED, redLEDCurrent);
-	  pulseOximiter_setLedCurrent(IR_LED, IrLedCurrent);
+      pulseOximeter_setLedCurrent(RED_LED, redLEDCurrent);
+	  pulseOximeter_setLedCurrent(IR_LED, IrLedCurrent);
     }
     else if(redLedDC - IRLedDC > MAGIC_ACCEPTABLE_INTENSITY_DIFF && redLEDCurrent > 0)
     {
-      redLEDCurrent--;pulseOximiter_setLedCurrent(RED_LED, redLEDCurrent);
-      pulseOximiter_setLedCurrent(IR_LED, IrLedCurrent);
+      redLEDCurrent--;pulseOximeter_setLedCurrent(RED_LED, redLEDCurrent);
+      pulseOximeter_setLedCurrent(IR_LED, IrLedCurrent);
     }
 
     lastREDLedCurrentCheck = millis();
@@ -638,7 +641,7 @@ void pulseOximiter_registerDump(void)
 	uint8_t readResult;
 	//uint8_t buf[12];
 
-	readStatus = pulseOximiter_readRegister(INT_STATUS_1, &readResult);
+	readStatus = pulseOximeter_readRegister(INT_STATUS_1, &readResult);
 	if( readStatus == -1){
 		uart_PrintString("I2C read error!");
 		return;
@@ -648,7 +651,7 @@ void pulseOximiter_registerDump(void)
 	uart_PrintString("INT_STATUS_1: 0x");
 	uart_PrintInt(readResult, 16);
 
-	readStatus = pulseOximiter_readRegister(INT_STATUS_2, &readResult);
+	readStatus = pulseOximeter_readRegister(INT_STATUS_2, &readResult);
 	if( readStatus == -1){
 		uart_PrintString("I2C read error!");
 		return;
@@ -658,7 +661,7 @@ void pulseOximiter_registerDump(void)
 	uart_PrintString("INT_STATUS_2: 0x");
 	uart_PrintInt(readResult, 16);
 
-	readStatus = pulseOximiter_readRegister(INT_ENABLE_1, &readResult);
+	readStatus = pulseOximeter_readRegister(INT_ENABLE_1, &readResult);
 	if( readStatus == -1){
 		uart_PrintString("I2C read error!");
 		return;
@@ -668,7 +671,7 @@ void pulseOximiter_registerDump(void)
 	uart_PrintString("INT_ENABLE_1: 0x");
 	uart_PrintInt(readResult, 16);
 
-	readStatus = pulseOximiter_readRegister(INT_ENABLE_2, &readResult);
+	readStatus = pulseOximeter_readRegister(INT_ENABLE_2, &readResult);
 	if( readStatus == -1){
 		uart_PrintString("I2C read error!");
 		return;
@@ -677,7 +680,7 @@ void pulseOximiter_registerDump(void)
 	uart_PrintString("INT_ENABLE_2: 0x");
 	uart_PrintInt(readResult, 16);
 
-	readStatus = pulseOximiter_readRegister(FIFO_WRITE_PTR, &readResult);
+	readStatus = pulseOximeter_readRegister(FIFO_WRITE_PTR, &readResult);
 	if( readStatus == -1){
 		uart_PrintString("I2C read error!");
 		return;
@@ -686,7 +689,7 @@ void pulseOximiter_registerDump(void)
 	uart_PrintString("FIFO_WRITE_PTR: 0x");
 	uart_PrintInt(readResult, 16);
 
-	readStatus = pulseOximiter_readRegister(FIFO_OVF_COUNTER, &readResult);
+	readStatus = pulseOximeter_readRegister(FIFO_OVF_COUNTER, &readResult);
 	if( readStatus == -1){
 		uart_PrintString("I2C read error!");
 		return;
@@ -695,7 +698,7 @@ void pulseOximiter_registerDump(void)
 	uart_PrintString("FIFO_OVF_COUNTER: 0x");
 	uart_PrintInt(readResult, 16);
 
-	readStatus = pulseOximiter_readRegister(FIFO_READ_POINTER, &readResult);
+	readStatus = pulseOximeter_readRegister(FIFO_READ_POINTER, &readResult);
 	if( readStatus == -1){
 		uart_PrintString("I2C read error!");
 		return;
@@ -704,7 +707,7 @@ void pulseOximiter_registerDump(void)
 	uart_PrintString("FIFO_READ_POINTER: 0x");
 	uart_PrintInt(readResult, 16);
 
-	readStatus = pulseOximiter_readRegister(FIFO_DATA, &readResult);
+	readStatus = pulseOximeter_readRegister(FIFO_DATA, &readResult);
 	if( readStatus == -1){
 		uart_PrintString("I2C read error!");
 		return;
@@ -713,7 +716,7 @@ void pulseOximiter_registerDump(void)
 	uart_PrintString("FIFO_DATA_REGISTER: 0x");
 	uart_PrintInt(readResult, 16);
 
-	readStatus = pulseOximiter_readRegister(FIFO_CONFIG, &readResult);
+	readStatus = pulseOximeter_readRegister(FIFO_CONFIG, &readResult);
 	if( readStatus == -1){
 		uart_PrintString("I2C read error!");
 		return;
@@ -722,7 +725,7 @@ void pulseOximiter_registerDump(void)
 	uart_PrintString("FIFO_CONFIG: 0x");
 	uart_PrintInt(readResult, 16);
 
-	readStatus = pulseOximiter_readRegister(MODE_CONFIG, &readResult);
+	readStatus = pulseOximeter_readRegister(MODE_CONFIG, &readResult);
 	if( readStatus == -1){
 		uart_PrintString("I2C read error!");
 		return;
@@ -731,7 +734,7 @@ void pulseOximiter_registerDump(void)
 	uart_PrintString("MODE_CONFIG: 0x");
 	uart_PrintInt(readResult, 16);
 
-	readStatus = pulseOximiter_readRegister(SPO2_CONFIG, &readResult);
+	readStatus = pulseOximeter_readRegister(SPO2_CONFIG, &readResult);
 	if( readStatus == -1){
 		uart_PrintString("I2C read error!");
 		return;
@@ -740,7 +743,7 @@ void pulseOximiter_registerDump(void)
 	uart_PrintString("SPO2_CONFIG: 0x");
 	uart_PrintInt(readResult, 16);
 
-	readStatus = pulseOximiter_readRegister(LED_PULSE_AMP_1, &readResult);
+	readStatus = pulseOximeter_readRegister(LED_PULSE_AMP_1, &readResult);
 	if( readStatus == -1){
 		uart_PrintString("I2C read error!");
 		return;
@@ -749,7 +752,7 @@ void pulseOximiter_registerDump(void)
 	uart_PrintString("LED_PULSE_AMP_1: 0x");
 	uart_PrintInt(readResult, 16);
 
-	readStatus = pulseOximiter_readRegister(LED_PULSE_AMP_2, &readResult);
+	readStatus = pulseOximeter_readRegister(LED_PULSE_AMP_2, &readResult);
 	if( readStatus == -1){
 		uart_PrintString("I2C read error!");
 		return;
@@ -758,7 +761,7 @@ void pulseOximiter_registerDump(void)
 	uart_PrintString("LED_PULSE_AMP_2: 0x");
 	uart_PrintInt(readResult, 16);
 
-	readStatus = pulseOximiter_readRegister(LED_MODE_CONTROL_1, &readResult);
+	readStatus = pulseOximeter_readRegister(LED_MODE_CONTROL_1, &readResult);
 	if( readStatus == -1){
 		uart_PrintString("I2C read error!");
 		return;
@@ -767,7 +770,7 @@ void pulseOximiter_registerDump(void)
 	uart_PrintString("LED_MODE_CONTROL_1: 0x");
 	uart_PrintInt(readResult, 16);
 
-	readStatus = pulseOximiter_readRegister(LED_MODE_CONTROL_2, &readResult);
+	readStatus = pulseOximeter_readRegister(LED_MODE_CONTROL_2, &readResult);
 	if( readStatus == -1){
 		uart_PrintString("I2C read error!");
 		return;
@@ -776,7 +779,7 @@ void pulseOximiter_registerDump(void)
 	uart_PrintString("LED_MODE_CONTROL_2: 0x");
 	uart_PrintInt(readResult, 16);
 
-	readStatus = pulseOximiter_readRegister(DIE_TEMP_INTEGER, &readResult);
+	readStatus = pulseOximeter_readRegister(DIE_TEMP_INTEGER, &readResult);
 	if( readStatus == -1){
 		uart_PrintString("I2C read error!");
 		return;
@@ -785,7 +788,7 @@ void pulseOximiter_registerDump(void)
 	uart_PrintString("DIE_TEMP_INTEGER: 0x");
 	uart_PrintInt(readResult, 16);
 
-	readStatus = pulseOximiter_readRegister(DIE_TEMP_FRACTION, &readResult);
+	readStatus = pulseOximeter_readRegister(DIE_TEMP_FRACTION, &readResult);
 	if( readStatus == -1){
 		uart_PrintString("I2C read error!");
 		return;
@@ -794,7 +797,7 @@ void pulseOximiter_registerDump(void)
 	uart_PrintString("DIE_TEMP_FRACTION: 0x");
 	uart_PrintInt(readResult, 16);
 
-	readStatus = pulseOximiter_readRegister(DIE_TEMP_CONFIG, &readResult);
+	readStatus = pulseOximeter_readRegister(DIE_TEMP_CONFIG, &readResult);
 	if( readStatus == -1){
 		uart_PrintString("I2C read error!");
 		return;
@@ -803,7 +806,7 @@ void pulseOximiter_registerDump(void)
 	uart_PrintString("DIE_TEMP_CONFIG: 0x");
 	uart_PrintInt(readResult, 16);
 
-	readStatus = pulseOximiter_readRegister(REVISION_ID, &readResult);
+	readStatus = pulseOximeter_readRegister(REVISION_ID, &readResult);
 	if( readStatus == -1){
 		uart_PrintString("I2C read error!");
 		return;
@@ -812,7 +815,7 @@ void pulseOximiter_registerDump(void)
 	uart_PrintString("REVISION_ID: 0x");
 	uart_PrintInt(readResult, 16);
 
-	readStatus = pulseOximiter_readRegister(PART_ID, &readResult);
+	readStatus = pulseOximeter_readRegister(PART_ID, &readResult);
 	if( readStatus == -1){
 		uart_PrintString("I2C read error!");
 		return;
@@ -824,19 +827,17 @@ void pulseOximiter_registerDump(void)
 	uart_PrintString("\r\n");
 }
 
-void pulseOximiter_displayData(void)
+void pulseOximeter_displayData(void)
 {
 	uart_PrintString("MAX30102 Pulse Oximiter Data:\r\n");
 
 	uart_PrintString("Die Temperature: ");
-	uart_PrintFloat(pulseOximiter.temperature);
-	uart_PrintString("\r\n");
+	uart_PrintFloat(pulseOximeter.temperature);
 
 	uart_PrintString("Heart Rate (BPM): ");
-	uart_PrintFloat(pulseOximiter.heartBPM);
-	uart_PrintString("\r\n");
+	uart_PrintFloat(pulseOximeter.heartBPM);
 
 	uart_PrintString("Oxygen Saturation SpO2 (%): ");
-	uart_PrintFloat(pulseOximiter.SpO2);
+	uart_PrintFloat(pulseOximeter.SpO2);
 	uart_PrintString("\r\n");
 }
