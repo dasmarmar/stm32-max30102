@@ -439,13 +439,9 @@ int8_t pulseOximeter_readFIFO(uint8_t* dataBuf, uint8_t numBytes)
 // Read the INT STATUS register to clear interrupt
 void pulseOximeter_clearInterrupt(void)
 {
-	uint8_t readStatus;
 	uint8_t readResult;
 
-	readStatus = pulseOximeter_readRegister(INT_STATUS_1, &readResult);
-    /*if( readStatus == -1){
-
-    }*/
+	pulseOximeter_readRegister(INT_STATUS_1, &readResult);
 }
 
 

@@ -17,9 +17,9 @@ pulse_oximeter.c:369:6:pulseOximeter_initFifo	8	static
 pulse_oximeter.c:386:15:pulseOximeter_readFifo	40	static
 pulse_oximeter.c:410:8:pulseOximeter_readFIFO	48	static
 pulse_oximeter.c:440:6:pulseOximeter_clearInterrupt	16	static
-pulse_oximeter.c:452:7:pulseOximeter_readTemperature	32	static
-pulse_oximeter.c:483:10:pulseOximeter_update	72	static
-pulse_oximeter.c:544:6:detectPulse	32	static
-pulse_oximeter.c:627:6:balanceIntesities	24	static
-pulse_oximeter.c:649:6:pulseOximiter_registerDump	16	static
-pulse_oximeter.c:841:6:pulseOximeter_displayData	8	static
+pulse_oximeter.c:448:7:pulseOximeter_readTemperature	32	static
+pulse_oximeter.c:479:10:pulseOximeter_update	72	static
+pulse_oximeter.c:540:6:detectPulse	32	static
+pulse_oximeter.c:623:6:balanceIntesities	24	static
+pulse_oximeter.c:645:6:pulseOximiter_registerDump	16	static
+pulse_oximeter.c:837:6:pulseOximeter_displayData	8	static

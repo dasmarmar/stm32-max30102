@@ -327,7 +327,7 @@ Discarded input sections
  .text.pulseOximeter_readFIFO
                 0x0000000000000000       0xa0 Core/Src/pulse_oximeter.o
  .text.pulseOximeter_clearInterrupt
-                0x0000000000000000       0x1c Core/Src/pulse_oximeter.o
+                0x0000000000000000       0x18 Core/Src/pulse_oximeter.o
  .text.pulseOximiter_registerDump
                 0x0000000000000000      0x430 Core/Src/pulse_oximeter.o
  .debug_macro   0x0000000000000000      0xa5a Core/Src/pulse_oximeter.o
@@ -4638,13 +4638,13 @@ LOAD c:/st/stm32cubeide_1.5.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.exte
                 0x0000000020000174        0x1 Core/Src/pulse_oximeter.o
                 0x0000000020000174                currentPulseDetectorState
  *fill*         0x0000000020000175        0x3 
- .bss.prev_sensor_value.9279
+ .bss.prev_sensor_value.9278
                 0x0000000020000178        0x4 Core/Src/pulse_oximeter.o
- .bss.lastBeat.9282
+ .bss.lastBeat.9281
                 0x000000002000017c        0x4 Core/Src/pulse_oximeter.o
- .bss.currentBeat.9281
+ .bss.currentBeat.9280
                 0x0000000020000180        0x4 Core/Src/pulse_oximeter.o
- .bss.values_went_down.9280
+ .bss.values_went_down.9279
                 0x0000000020000184        0x1 Core/Src/pulse_oximeter.o
  *fill*         0x0000000020000185        0x3 
  .bss.__sbrk_heap_end
@@ -4808,26 +4808,26 @@ LOAD c:/st/stm32cubeide_1.5.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.exte
                 0x0000000000000aa4       0x22 c:/st/stm32cubeide_1.5.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.7-2018-q2-update.win32_1.5.0.202011040924/tools/bin/../lib/gcc/arm-none-eabi/7.3.1/thumb/v7e-m/fpv4-sp/hard/crtn.o
 OUTPUT(stm32-max30102.elf elf32-littlearm)
 
-.debug_info     0x0000000000000000    0x1025f
+.debug_info     0x0000000000000000    0x10250
  .debug_info    0x0000000000000000      0x2fa Core/Src/filter.o
  .debug_info    0x00000000000002fa     0x2021 Core/Src/main.o
- .debug_info    0x000000000000231b     0x1af6 Core/Src/pulse_oximeter.o
- .debug_info    0x0000000000003e11     0x113d Core/Src/stm32f4xx_hal_msp.o
- .debug_info    0x0000000000004f4e      0x231 Core/Src/stm32f4xx_it.o
- .debug_info    0x000000000000517f      0x985 Core/Src/sysmem.o
- .debug_info    0x0000000000005b04      0x1b3 Core/Src/system.o
- .debug_info    0x0000000000005cb7      0x56e Core/Src/system_stm32f4xx.o
- .debug_info    0x0000000000006225      0xed5 Core/Src/uart.o
- .debug_info    0x00000000000070fa       0x22 Core/Startup/startup_stm32f429zitx.o
- .debug_info    0x000000000000711c      0x9b9 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.o
- .debug_info    0x0000000000007ad5      0xe5e Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.o
- .debug_info    0x0000000000008933      0x7cf Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.o
- .debug_info    0x0000000000009102     0x2433 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.o
- .debug_info    0x000000000000b535      0x719 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c_ex.o
- .debug_info    0x000000000000bc4e     0x11ca Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd.o
- .debug_info    0x000000000000ce18      0x91e Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.o
- .debug_info    0x000000000000d736     0x124c Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.o
- .debug_info    0x000000000000e982     0x18dd Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.o
+ .debug_info    0x000000000000231b     0x1ae7 Core/Src/pulse_oximeter.o
+ .debug_info    0x0000000000003e02     0x113d Core/Src/stm32f4xx_hal_msp.o
+ .debug_info    0x0000000000004f3f      0x231 Core/Src/stm32f4xx_it.o
+ .debug_info    0x0000000000005170      0x985 Core/Src/sysmem.o
+ .debug_info    0x0000000000005af5      0x1b3 Core/Src/system.o
+ .debug_info    0x0000000000005ca8      0x56e Core/Src/system_stm32f4xx.o
+ .debug_info    0x0000000000006216      0xed5 Core/Src/uart.o
+ .debug_info    0x00000000000070eb       0x22 Core/Startup/startup_stm32f429zitx.o
+ .debug_info    0x000000000000710d      0x9b9 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.o
+ .debug_info    0x0000000000007ac6      0xe5e Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.o
+ .debug_info    0x0000000000008924      0x7cf Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.o
+ .debug_info    0x00000000000090f3     0x2433 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.o
+ .debug_info    0x000000000000b526      0x719 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c_ex.o
+ .debug_info    0x000000000000bc3f     0x11ca Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pcd.o
+ .debug_info    0x000000000000ce09      0x91e Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.o
+ .debug_info    0x000000000000d727     0x124c Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.o
+ .debug_info    0x000000000000e973     0x18dd Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_usb.o
 
 .debug_abbrev   0x0000000000000000     0x232f
  .debug_abbrev  0x0000000000000000      0x156 Core/Src/filter.o
